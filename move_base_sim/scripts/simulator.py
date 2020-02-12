@@ -21,11 +21,11 @@ class Robot:
 
     # simulate noise and uncertainty in the robot's motion. I'm using Gaussian noise for these
     def move(self, angle, dist):
-        orientation = self.orientation + float(angle) + random.gauss(0.0, self.orientation_error)
+        orientation = self.orientation + float(angle) + random.gauss(0.0, self.orientation_error) * self.dt
         orientation %= 2 * pi
         # distance to move
         # move, and add randomness to the motion command
-        dist = dist + random.gauss(0.0, self.position_error)
+        dist = (dist + random.gauss(0.0, self.position_error)) * self.dt
         self.x = self.x + (cos(orientation) * dist)
         self.y = self.y + (sin(orientation) * dist)
         self.orientation = orientation
@@ -64,15 +64,22 @@ def tf_from_pose(p):
     br.sendTransform(t)
 
 
+def twist_command_handler(twist):
+    theta = twist.angular.z
+    vec = twist.linear.x
+    my_robot.move(theta, vec)
+
 
 if __name__ == '__main__':
     rospy.init_node('dummy_robot')
     pub = rospy.Publisher('odom1', geometry_msgs.msg.PoseStamped, queue_size=10)
+    twist_sub = rospy.Subscriber('cmd_vel', geometry_msgs.msg.Twist, twist_command_handler, queue_size=10)
     my_robot = Robot(0, 0, 0)
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
         my_robot.set_noise(0, 0)
-        my_robot.move(0.001, 0.05)
+        # my_robot.move(0.001, 0.05)
         tf_from_pose(my_robot.get_pose())
         pub.publish(my_robot.get_pose())
         rate.sleep()
+
