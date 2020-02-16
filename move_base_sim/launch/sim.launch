@@ -1,0 +1,8 @@
+<launch>
+    <include file="$(find robot_setup_tf)/launch/move_base.launch"/>
+    <node pkg="tf" type="static_transform_publisher" name="map_to_odom_tf_pub"
+          args="0 0 0 0 0 0 1 map odom 50"/>
+    <!--<node pkg="map_server" type="map_server" name="map_server" args="$(find robot_setip_tf/clean_map/porto_track.yaml"/>-->
+    <node pkg="move_base_sim" name="simulator" type="simulator.py"/>
+
+</launch>

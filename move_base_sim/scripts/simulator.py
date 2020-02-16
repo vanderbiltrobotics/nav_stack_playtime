@@ -39,7 +39,7 @@ class Robot:
     def get_pose(self):
         p = geometry_msgs.msg.PoseStamped()
         p.header.stamp = rospy.Time.now()
-        p.header.frame_id = "map"
+        p.header.frame_id = "odom"
         p.pose.position.x = self.x
         p.pose.position.y = self.y
         p.pose.position.z = 0
@@ -56,7 +56,7 @@ def tf_from_pose(p):
     t = geometry_msgs.msg.TransformStamped()
 
     t.header.stamp = rospy.Time.now()
-    t.header.frame_id = "map"
+    t.header.frame_id = "odom"
     t.child_frame_id = "base_link"
     t.transform.translation = p.pose.position
     t.transform.rotation = p.pose.orientation
